@@ -15,6 +15,25 @@ PW : admin123
 3. Login menggunakan username dan password anda
 
 ## Dashboard Admin ##
-Jika ingin menambahkan data dan jadwal dokter yang baru
+
+# A. Tambah Data Dokter #
 1. Klik button tambah 
 2. Masukkan data diri dan jadwal dokter
+
+# B. Update Data Dokter #
+1. Klik button edit
+2. Masukkan data diri dan jadwal yang ingin diubah
+
+# C. Delete Data Dokter #
+1. Klik button delete
+2. Konfirmasi apakah ingin benar benar menghapus
+
+# D. Proses Konsultasi #
+1. Klik fitur "Antrean & Penyelesaian konsultasi
+2. Periksa pasien
+3. Input hasil konsultasi 
+
+# E. Logout #
+
+## Dashboard Pasien ##
+Dashboard pasien hanya berisikan data dan jadwal dokter yang tersedia
