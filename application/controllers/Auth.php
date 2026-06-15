@@ -47,5 +47,37 @@ class Auth extends CI_Controller
         $this->session->sess_destroy();
         redirect('auth');
     }
+ public function registrasi()
+    {
+        $this->load->view('registrasi_view');
+    }
 
+    public function proses_registrasi()
+    {
+        $username = $this->input->post('username');
+        $password = $this->input->post('password');
+
+        // 1. Simpan ke data user untuk login
+        $data_user = array(
+            'username' => $username,
+            'password' => password_hash($password, PASSWORD_BCRYPT), // Enkripsi aman
+            'role' => 'pasien'
+        );
+        $this->db->insert('user', $data_user);
+        $id_user = $this->db->insert_id();
+
+        // 2. Simpan ke data biodata pasien
+        $data_pasien = array(
+            'id_user' => $id_user,
+            'nama_pasien' => $this->input->post('nama_pasien'),
+            'tanggal_lahir' => $this->input->post('tanggal_lahir'),
+            'jenis_kelamin' => $this->input->post('jenis_kelamin'),
+            'nomor_hp' => $this->input->post('nomor_hp'),
+            'alamat' => $this->input->post('alamat')
+        );
+        $this->db->insert('pasien', $data_pasien);
+
+        $this->session->set_flashdata('success', 'Registrasi berhasil! Silakan login.');
+        redirect('auth');
+    }
 }
