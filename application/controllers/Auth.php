@@ -6,7 +6,7 @@ class Auth extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('AuthModel');
+        $this->load->model('Auth_model');
     }
 
     public function index()
@@ -17,19 +17,17 @@ class Auth extends CI_Controller
         $this->load->view('login_view');
     }
 
-    // LOGIN
     public function proses_login()
     {
         $username = $this->input->post('username');
         $password = $this->input->post('password');
 
-        $user = $this->AuthModel->login($username, $password);
-
+        $user = $this->Auth_model->login($username, $password);
         if ($user) {
             $session_data = array(
-                'id_user'   => $user->id_user,
-                'username'  => $user->username,
-                'role'      => $user->role,
+                'id_user' => $user->id_user,
+                'username' => $user->username,
+                'role' => $user->role,
                 'logged_in' => TRUE
             );
             $this->session->set_userdata($session_data);
@@ -65,22 +63,25 @@ class Auth extends CI_Controller
         $data_user = array(
             'username' => $username,
             'password' => password_hash($password, PASSWORD_BCRYPT), // Enkripsi aman
-            'role'     => 'pasien'
+            'role' => 'pasien'
         );
-        $id_user = $this->AuthModel->registerUser($data_user);
+        $this->db->insert('user', $data_user);
+        $id_user = $this->db->insert_id();
 
         // 2. Simpan ke data biodata pasien
         $data_pasien = array(
-            'id_user'       => $id_user,
-            'nama_pasien'   => $this->input->post('nama_pasien'),
+            'id_user' => $id_user,
+            'nama_pasien' => $this->input->post('nama_pasien'),
             'tanggal_lahir' => $this->input->post('tanggal_lahir'),
             'jenis_kelamin' => $this->input->post('jenis_kelamin'),
-            'nomor_hp'      => $this->input->post('nomor_hp'),
-            'alamat'        => $this->input->post('alamat')
+            'nomor_hp' => $this->input->post('nomor_hp'),
+            'alamat' => $this->input->post('alamat')
         );
-        $this->AuthModel->registerPasien($data_pasien);
+        $this->db->insert('pasien', $data_pasien);
 
         $this->session->set_flashdata('success', 'Registrasi berhasil! Silakan login.');
         redirect('auth');
     }
+
+
 }
