@@ -72,8 +72,7 @@ class Admin extends CI_Controller
         );
         $this->AdminModel->tambahKonsultasi($data_konsultasi);
 
-        // KODE LAMA YANG MENGHAPUS / MENGUBAH STATUS JADWAL KITA HAPUS
-        // Sehingga tombol daftar tidak akan hilang dan bisa diklik berkali-kali untuk pasien berbeda
+
 
         $this->session->set_flashdata('success', 'Pasien berhasil ditambahkan ke dalam antrean!');
         redirect('admin/dashboard');
@@ -96,7 +95,7 @@ class Admin extends CI_Controller
         // Update status konsultasi menjadi 'selesai'
         $this->AdminModel->updateStatusKonsultasi($id_konsultasi, 'selesai');
 
-        // KODE LAMA YANG MENGUBAH JADWAL MENJADI 'TERSEDIA' DIHAPUS karena statusnya sekarang selalu aktif
+        
 
         $this->session->set_flashdata('success', 'Pasien selesai diperiksa dan rekam medis disimpan.');
         redirect('admin/dashboard');
