@@ -13,3 +13,8 @@ PW : admin123
 1. Klik daftar/buat akun
 2. Masukkan data diri
 3. Login menggunakan username dan password anda
+
+## Dashboard Admin ##
+Jika ingin menambahkan data dan jadwal dokter yang baru
+1. Klik button tambah 
+2. Masukkan data diri dan jadwal dokter

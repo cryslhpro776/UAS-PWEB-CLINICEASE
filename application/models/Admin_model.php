@@ -66,4 +66,52 @@ class Admin_model extends CI_Model {
         $this->db->trans_complete();
         return $this->db->trans_status();
     }
+        // Mengambil 1 data dokter + jadwal berdasarkan id_dokter (untuk form edit)
+    public function get_dokter_by_id($id_dokter) {
+        $this->db->select('dokter.*, id_jadwal, hari, jam_mulai, jam_selesai');
+        $this->db->from('dokter');
+        $this->db->join('jadwal_dokter', 'dokter.id_dokter = jadwal_dokter.id_dokter', 'left');
+        $this->db->where('dokter.id_dokter', $id_dokter);
+        return $this->db->get()->row();
+    }
+
+    // Update data dokter + jadwalnya
+    public function update_dokter($id_dokter, $data_dokter, $data_jadwal) {
+        $this->db->trans_start();
+
+        $this->db->where('id_dokter', $id_dokter);
+        $this->db->update('dokter', $data_dokter);
+
+        $this->db->where('id_dokter', $id_dokter);
+        $this->db->update('jadwal_dokter', $data_jadwal);
+
+        $this->db->trans_complete();
+        return $this->db->trans_status();
+    }
+
+    // Hapus dokter beserta jadwalnya
+    public function delete_dokter($id_dokter) {
+        $this->db->trans_start();
+
+        $this->db->where('id_dokter', $id_dokter);
+        $this->db->delete('jadwal_dokter');
+
+        $this->db->where('id_dokter', $id_dokter);
+        $this->db->delete('dokter');
+
+        $this->db->trans_complete();
+        return $this->db->trans_status();
+    }
+
+    // (Opsional) Hapus pasien
+    public function delete_pasien($id_pasien) {
+        $this->db->where('id_pasien', $id_pasien);
+        return $this->db->delete('pasien');
+    }
+
+    // (Opsional) Batalkan/hapus item antrean konsultasi
+    public function delete_konsultasi($id_konsultasi) {
+        $this->db->where('id_konsultasi', $id_konsultasi);
+        return $this->db->delete('konsultasi');
+    }
 }

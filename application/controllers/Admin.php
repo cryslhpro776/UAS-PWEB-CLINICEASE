@@ -87,4 +87,61 @@ class Admin extends CI_Controller {
         $this->session->set_flashdata('success', 'Pasien selesai diperiksa dan rekam medis disimpan.');
         redirect('admin/dashboard');
     }
+        // 5. Menampilkan form edit dokter
+    public function edit_dokter($id_dokter) {
+        $data['dokter'] = $this->Admin_model->get_dokter_by_id($id_dokter);
+
+        if (!$data['dokter']) {
+            $this->session->set_flashdata('error', 'Data dokter tidak ditemukan.');
+            redirect('admin/dashboard');
+        }
+
+        $this->load->view('admin/edit_dokter_view', $data);
+    }
+
+    // 6. Memproses update data dokter
+    public function update_dokter() {
+        $id_dokter = $this->input->post('id_dokter');
+
+        $data_dokter = array(
+            'nama_dokter'  => $this->input->post('nama_dokter'),
+            'spesialisasi' => $this->input->post('spesialisasi'),
+            'nomor_sip'    => $this->input->post('nomor_sip')
+        );
+
+        $data_jadwal = array(
+            'hari'        => $this->input->post('hari'),
+            'jam_mulai'   => $this->input->post('jam_mulai'),
+            'jam_selesai' => $this->input->post('jam_selesai'),
+        );
+
+        $this->Admin_model->update_dokter($id_dokter, $data_dokter, $data_jadwal);
+
+        $this->session->set_flashdata('success', 'Data dokter berhasil diperbarui!');
+        redirect('admin/dashboard');
+    }
+
+    // 7. Hapus dokter
+    public function hapus_dokter($id_dokter) {
+        $this->Admin_model->delete_dokter($id_dokter);
+
+        $this->session->set_flashdata('success', 'Data dokter berhasil dihapus!');
+        redirect('admin/dashboard');
+    }
+
+    // 8. (Opsional) Hapus pasien
+    public function hapus_pasien($id_pasien) {
+        $this->Admin_model->delete_pasien($id_pasien);
+
+        $this->session->set_flashdata('success', 'Data pasien berhasil dihapus!');
+        redirect('admin/dashboard');
+    }
+
+    // 9. (Opsional) Batalkan antrean konsultasi
+    public function hapus_konsultasi($id_konsultasi) {
+        $this->Admin_model->delete_konsultasi($id_konsultasi);
+
+        $this->session->set_flashdata('success', 'Antrean konsultasi berhasil dihapus!');
+        redirect('admin/dashboard');
+    }
 }
