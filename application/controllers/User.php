@@ -16,7 +16,7 @@ class Auth extends CI_Controller
         }
         $this->load->view('login_view');
     }
-
+// LOGIN
     public function proses_login()
     {
         $username = $this->input->post('username');
