@@ -139,81 +139,91 @@
                                 class="form-control" required></div>
                         <hr>
                         <h6>Atur Jadwal Kerja Praktek:</h6>
-                        <div class="mb-2"><label class="form-label">Hari</label><input type="text" name="hari"
-                                class="form-control" placeholder="Contoh: Senin" required></div>
-                        <div class="row">
-                            <div class="col"><label class="form-label">Jam Mulai</label><input type="time"
-                                    name="jam_mulai" class="form-control" required></div>
-                            <div class="col"><label class="form-label">Jam Selesai</label><input type="time"
-                                    name="jam_selesai" class="form-control" required></div>
-                        </div>
-                    </div>
-                    <div class="modal-footer"><button type="submit" class="btn btn-primary w-100">Simpan Data
-                            Dokter</button></div>
-                </form>
-            </div>
-        </div>
-
-        <div class="modal fade" id="modalDaftar" tabindex="-1">
-            <div class="modal-dialog">
-                <form action="<?= base_url('admin/daftar_konsultasi'); ?>" method="POST" class="modal-content">
-                    <div class="modal-header bg-info text-white">
-                        <h5 class="modal-title">Registrasi Pendaftaran Konsultasi </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" name="id_jadwal" id="input_id_jadwal">
-                        <div class="mb-3">
-                            <label class="form-label">Pilih Pasien Klinik</label>
-                            <select name="id_pasien" class="form-select" required>
-                                <option value="">-- Cari Pasien Terdaftar --</option>
-                                <?php foreach ($pasien_list as $p): ?>
-                                    <option value="<?= $p->id_pasien; ?>"><?= $p->nama_pasien; ?> (<?= $p->nomor_hp; ?>)
-                                    </option>
-                                <?php endforeach; ?>
+                        <div class="mb-2">
+                            <label class="form-label">Hari Praktik</label>
+                            <select name="hari" class="form-select" required>
+                                <option value="">-- Pilih Hari Praktik --</option>
+                                <option value="Senin">Senin</option>
+                                <option value="Selasa">Selasa</option>
+                                <option value="Rabu">Rabu</option>
+                                <option value="Kamis">Kamis</option>
+                                <option value="Jumat">Jumat</option>
+                                <option value="Sabtu">Sabtu</option>
+                                <option value="Minggu">Minggu</option>
                             </select>
                         </div>
+                        <div class="col"><label class="form-label">Jam Mulai</label><input type="time" name="jam_mulai"
+                                class="form-control" required></div>
+                        <div class="col"><label class="form-label">Jam Selesai</label><input type="time"
+                                name="jam_selesai" class="form-control" required></div>
                     </div>
-                    <div class="modal-footer"><button type="submit" class="btn btn-info text-white w-100">Proses Masuk
-                            Antrean</button></div>
-                </form>
             </div>
+            <div class="modal-footer"><button type="submit" class="btn btn-primary w-100">Simpan Data
+                    Dokter</button></div>
+            </form>
         </div>
+    </div>
 
-        <div class="modal fade" id="modalSelesai" tabindex="-1">
-            <div class="modal-dialog">
-                <form action="<?= base_url('admin/selesaikan_konsultasi'); ?>" method="POST" class="modal-content">
-                    <div class="modal-header bg-success text-white">
-                        <h5 class="modal-title">Input Catatan Rekam Medis Pasien</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    <div class="modal fade" id="modalDaftar" tabindex="-1">
+        <div class="modal-dialog">
+            <form action="<?= base_url('admin/daftar_konsultasi'); ?>" method="POST" class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">Registrasi Pendaftaran Konsultasi </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id_jadwal" id="input_id_jadwal">
+                    <div class="mb-3">
+                        <label class="form-label">Pilih Pasien Klinik</label>
+                        <select name="id_pasien" class="form-select" required>
+                            <option value="">-- Cari Pasien Terdaftar --</option>
+                            <?php foreach ($pasien_list as $p): ?>
+                                <option value="<?= $p->id_pasien; ?>"><?= $p->nama_pasien; ?> (<?= $p->nomor_hp; ?>)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
-                    <div class="modal-body">
-                        <input type="hidden" name="id_konsultasi" id="selesai_id_konsultasi">
-                        <input type="hidden" name="id_pasien" id="selesai_id_pasien">
-                        <input type="hidden" name="id_jadwal" id="selesai_id_jadwal">
-
-                        <div class="mb-3"><label class="form-label">Diagnosis Medis</label><textarea name="diagnosis"
-                                class="form-control" rows="3" placeholder="Hasil pemeriksaan penyakit..."
-                                required></textarea></div>
-                        <div class="mb-3"><label class="form-label">Resep Obat / Catatan Tambahan</label><textarea
-                                name="catatan_medis" class="form-control" rows="3"
-                                placeholder="Tulis resep atau instruksi dokter..."></textarea></div>
-                    </div>
-                    <div class="modal-footer"><button type="submit" class="btn btn-success w-100">Simpan Rekam Medis &
-                            Selesai</button></div>
-                </form>
-            </div>
+                </div>
+                <div class="modal-footer"><button type="submit" class="btn btn-info text-white w-100">Proses Masuk
+                        Antrean</button></div>
+            </form>
         </div>
+    </div>
 
-        <script>
-            function setJadwalId(id) { document.getElementById('input_id_jadwal').value = id; }
-            function setSelesaiData(konsultasiId, pasienId, jadwalId) {
-                document.getElementById('selesai_id_konsultasi').value = konsultasiId;
-                document.getElementById('selesai_id_pasien').value = pasienId;
-                document.getElementById('selesai_id_jadwal').value = jadwalId;
-            }
-        </script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="modal fade" id="modalSelesai" tabindex="-1">
+        <div class="modal-dialog">
+            <form action="<?= base_url('admin/selesaikan_konsultasi'); ?>" method="POST" class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Input Catatan Rekam Medis Pasien</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id_konsultasi" id="selesai_id_konsultasi">
+                    <input type="hidden" name="id_pasien" id="selesai_id_pasien">
+                    <input type="hidden" name="id_jadwal" id="selesai_id_jadwal">
+
+                    <div class="mb-3"><label class="form-label">Diagnosis Medis</label><textarea name="diagnosis"
+                            class="form-control" rows="3" placeholder="Hasil pemeriksaan penyakit..."
+                            required></textarea></div>
+                    <div class="mb-3"><label class="form-label">Resep Obat / Catatan Tambahan</label><textarea
+                            name="catatan_medis" class="form-control" rows="3"
+                            placeholder="Tulis resep atau instruksi dokter..."></textarea></div>
+                </div>
+                <div class="modal-footer"><button type="submit" class="btn btn-success w-100">Simpan Rekam Medis &
+                        Selesai</button></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function setJadwalId(id) { document.getElementById('input_id_jadwal').value = id; }
+        function setSelesaiData(konsultasiId, pasienId, jadwalId) {
+            document.getElementById('selesai_id_konsultasi').value = konsultasiId;
+            document.getElementById('selesai_id_pasien').value = pasienId;
+            document.getElementById('selesai_id_jadwal').value = jadwalId;
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
