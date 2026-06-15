@@ -31,13 +31,13 @@ class Admin_model extends CI_Model {
     public function insert_dokter($data_dokter, $data_jadwal) {
         // Gunakan database transaction agar jika salah satu insert gagal, data tidak rusak
         $this->db->trans_start();
-        
+
         $this->db->insert('dokter', $data_dokter);
         $id_dokter = $this->db->insert_id(); // Mengambil ID dokter yang baru terbuat
-        
+
         $data_jadwal['id_dokter'] = $id_dokter;
         $this->db->insert('jadwal_dokter', $data_jadwal);
-        
+
         $this->db->trans_complete();
         return $this->db->trans_status();
     }
@@ -55,27 +55,19 @@ class Admin_model extends CI_Model {
     // Aksi CRUD: Menyimpan rekam medis dan merubah status konsultasi menjadi selesai
     public function update_selesai_konsultasi($id_konsultasi, $data_rekam) {
         $this->db->trans_start();
-        
+
         // 1. Masukkan data ke rekam medis
         $this->db->insert('rekam_medis', $data_rekam);
-        
+
         // 2. Update status konsultasi menjadi 'selesai'
         $this->db->where('id_konsultasi', $id_konsultasi);
         $this->db->update('konsultasi', array('status_konsultasi' => 'selesai'));
-        
+
         $this->db->trans_complete();
         return $this->db->trans_status();
     }
-        // Mengambil 1 data dokter + jadwal berdasarkan id_dokter (untuk form edit)
-    public function get_dokter_by_id($id_dokter) {
-        $this->db->select('dokter.*, id_jadwal, hari, jam_mulai, jam_selesai');
-        $this->db->from('dokter');
-        $this->db->join('jadwal_dokter', 'dokter.id_dokter = jadwal_dokter.id_dokter', 'left');
-        $this->db->where('dokter.id_dokter', $id_dokter);
-        return $this->db->get()->row();
-    }
 
-    // Update data dokter + jadwalnya
+    // Aksi CRUD: Update data dokter beserta jadwalnya
     public function update_dokter($id_dokter, $data_dokter, $data_jadwal) {
         $this->db->trans_start();
 
@@ -89,7 +81,7 @@ class Admin_model extends CI_Model {
         return $this->db->trans_status();
     }
 
-    // Hapus dokter beserta jadwalnya
+    // Aksi CRUD: Hapus dokter beserta jadwal prakteknya
     public function delete_dokter($id_dokter) {
         $this->db->trans_start();
 
@@ -103,13 +95,7 @@ class Admin_model extends CI_Model {
         return $this->db->trans_status();
     }
 
-    // (Opsional) Hapus pasien
-    public function delete_pasien($id_pasien) {
-        $this->db->where('id_pasien', $id_pasien);
-        return $this->db->delete('pasien');
-    }
-
-    // (Opsional) Batalkan/hapus item antrean konsultasi
+    // Aksi CRUD: Hapus / batalkan antrean konsultasi
     public function delete_konsultasi($id_konsultasi) {
         $this->db->where('id_konsultasi', $id_konsultasi);
         return $this->db->delete('konsultasi');

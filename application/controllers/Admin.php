@@ -10,7 +10,7 @@ class Admin extends CI_Controller {
             $this->session->set_flashdata('error', 'Akses ditolak! Anda bukan admin.');
             redirect('auth');
         }
-        
+
         // Load Admin_model secara otomatis untuk semua fungsi di bawah
         $this->load->model('Admin_model');
     }
@@ -50,7 +50,7 @@ class Admin extends CI_Controller {
     // 3. Menerima data input untuk Pendaftaran Konsultasi Pasien
     public function daftar_konsultasi() {
         $id_jadwal = $this->input->post('id_jadwal');
-        
+
         // Cari info dokter berdasarkan jadwal melalui model
         $jadwal = $this->Admin_model->get_jadwal_by_id($id_jadwal);
 
@@ -87,19 +87,8 @@ class Admin extends CI_Controller {
         $this->session->set_flashdata('success', 'Pasien selesai diperiksa dan rekam medis disimpan.');
         redirect('admin/dashboard');
     }
-        // 5. Menampilkan form edit dokter
-    public function edit_dokter($id_dokter) {
-        $data['dokter'] = $this->Admin_model->get_dokter_by_id($id_dokter);
 
-        if (!$data['dokter']) {
-            $this->session->set_flashdata('error', 'Data dokter tidak ditemukan.');
-            redirect('admin/dashboard');
-        }
-
-        $this->load->view('admin/edit_dokter_view', $data);
-    }
-
-    // 6. Memproses update data dokter
+    // 5. Memproses update data dokter & jadwalnya
     public function update_dokter() {
         $id_dokter = $this->input->post('id_dokter');
 
@@ -121,27 +110,23 @@ class Admin extends CI_Controller {
         redirect('admin/dashboard');
     }
 
-    // 7. Hapus dokter
-    public function hapus_dokter($id_dokter) {
+    // 6. Menghapus data dokter beserta jadwalnya
+    public function hapus_dokter() {
+        $id_dokter = $this->input->post('id_dokter');
+
         $this->Admin_model->delete_dokter($id_dokter);
 
         $this->session->set_flashdata('success', 'Data dokter berhasil dihapus!');
         redirect('admin/dashboard');
     }
 
-    // 8. (Opsional) Hapus pasien
-    public function hapus_pasien($id_pasien) {
-        $this->Admin_model->delete_pasien($id_pasien);
+    // 7. Membatalkan / menghapus antrean konsultasi
+    public function hapus_konsultasi() {
+        $id_konsultasi = $this->input->post('id_konsultasi');
 
-        $this->session->set_flashdata('success', 'Data pasien berhasil dihapus!');
-        redirect('admin/dashboard');
-    }
-
-    // 9. (Opsional) Batalkan antrean konsultasi
-    public function hapus_konsultasi($id_konsultasi) {
         $this->Admin_model->delete_konsultasi($id_konsultasi);
 
-        $this->session->set_flashdata('success', 'Antrean konsultasi berhasil dihapus!');
+        $this->session->set_flashdata('success', 'Antrean konsultasi berhasil dibatalkan!');
         redirect('admin/dashboard');
     }
 }
