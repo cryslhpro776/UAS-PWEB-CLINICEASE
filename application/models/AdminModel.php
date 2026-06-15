@@ -1,23 +1,30 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Admin_model extends CI_Model {
+class AdminModel extends CI_Model
+{
+    // Daftar nilai ENUM yang valid untuk jadwal_dokter
+    private $hari_valid   = array('Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu');
+    private $status_valid = array('tersedia','sibuk');
 
-    // Mengambil semua data dokter beserta jadwal prakteknya
-    public function get_all_dokter() {
+    // Ambil semua data dokter beserta jadwal prakteknya
+    public function getDokterList()
+    {
         $this->db->select('dokter.*, id_jadwal, hari, jam_mulai, jam_selesai');
         $this->db->from('dokter');
         $this->db->join('jadwal_dokter', 'dokter.id_dokter = jadwal_dokter.id_dokter', 'left');
         return $this->db->get()->result();
     }
 
-    // Mengambil semua daftar pasien
-    public function get_all_pasien() {
+    // Ambil semua data pasien
+    public function getPasienList()
+    {
         return $this->db->get('pasien')->result();
     }
 
-    // Mengambil antrean konsultasi yang berstatus 'menunggu' (diurutkan dari yang paling dulu mendaftar)
-    public function get_antrean_menunggu() {
+    // Ambil antrean konsultasi berstatus 'menunggu', diurutkan dari yang paling dulu mendaftar
+    public function getAntrean()
+    {
         $this->db->select('konsultasi.*, pasien.nama_pasien, dokter.nama_dokter');
         $this->db->from('konsultasi');
         $this->db->join('pasien', 'konsultasi.id_pasien = pasien.id_pasien');
@@ -27,43 +34,50 @@ class Admin_model extends CI_Model {
         return $this->db->get()->result();
     }
 
-    // Aksi CRUD: Simpan data dokter dan otomatis buat data jadwalnya
-    public function insert_dokter($data_dokter, $data_jadwal) {
-        // Gunakan database transaction agar jika salah satu insert gagal, data tidak rusak
-        $this->db->trans_start();
-        
+    // Simpan data dokter baru, kembalikan ID dokter yang baru dibuat
+    public function tambahDokter($data_dokter)
+    {
         $this->db->insert('dokter', $data_dokter);
-        $id_dokter = $this->db->insert_id(); // Mengambil ID dokter yang baru terbuat
-        
-        $data_jadwal['id_dokter'] = $id_dokter;
-        $this->db->insert('jadwal_dokter', $data_jadwal);
-        
-        $this->db->trans_complete();
-        return $this->db->trans_status();
+        return $this->db->insert_id();
     }
 
-    // Mengambil baris jadwal dokter berdasarkan ID jadwal
-    public function get_jadwal_by_id($id_jadwal) {
+    // Simpan jadwal dokter, dengan validasi ENUM hari & status
+    public function tambahJadwal($data_jadwal)
+    {
+        if (!in_array($data_jadwal['hari'], $this->hari_valid)) {
+            return false; // hari tidak valid
+        }
+
+        if (!in_array($data_jadwal['status'], $this->status_valid)) {
+            $data_jadwal['status'] = 'tersedia'; // fallback default
+        }
+
+        $this->db->insert('jadwal_dokter', $data_jadwal);
+        return true;
+    }
+
+    // Ambil baris jadwal dokter berdasarkan id_jadwal
+    public function getJadwalById($id_jadwal)
+    {
         return $this->db->get_where('jadwal_dokter', array('id_jadwal' => $id_jadwal))->row();
     }
 
-    // Aksi CRUD: Menyimpan log pendaftaran konsultasi baru
-    public function insert_konsultasi($data_konsultasi) {
+    // Simpan pendaftaran konsultasi baru ke antrean
+    public function tambahKonsultasi($data_konsultasi)
+    {
         return $this->db->insert('konsultasi', $data_konsultasi);
     }
 
-    // Aksi CRUD: Menyimpan rekam medis dan merubah status konsultasi menjadi selesai
-    public function update_selesai_konsultasi($id_konsultasi, $data_rekam) {
-        $this->db->trans_start();
-        
-        // 1. Masukkan data ke rekam medis
-        $this->db->insert('rekam_medis', $data_rekam);
-        
-        // 2. Update status konsultasi menjadi 'selesai'
+    // Simpan rekam medis hasil konsultasi
+    public function simpanRekamMedis($data_rekam)
+    {
+        return $this->db->insert('rekam_medis', $data_rekam);
+    }
+
+    // Update status konsultasi (misal jadi 'selesai')
+    public function updateStatusKonsultasi($id_konsultasi, $status)
+    {
         $this->db->where('id_konsultasi', $id_konsultasi);
-        $this->db->update('konsultasi', array('status_konsultasi' => 'selesai'));
-        
-        $this->db->trans_complete();
-        return $this->db->trans_status();
+        return $this->db->update('konsultasi', array('status_konsultasi' => $status));
     }
 }
