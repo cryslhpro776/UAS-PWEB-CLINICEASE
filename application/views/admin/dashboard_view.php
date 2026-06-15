@@ -393,6 +393,58 @@
 
         .btn-examine:hover { background: #bbf7d0; }
 
+        /* Action group (edit/delete/cancel) */
+        .action-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border: 1.5px solid var(--sage-light);
+            border-radius: 8px;
+            background: none;
+            cursor: pointer;
+            transition: background .12s, border-color .12s, color .12s;
+            color: var(--ink-soft);
+        }
+
+        .btn-icon svg { width: 14px; height: 14px; }
+
+        .btn-icon.edit:hover {
+            background: var(--sage-muted);
+            border-color: var(--sage);
+            color: var(--sage-dark);
+        }
+
+        .btn-icon.delete:hover,
+        .btn-cancel:hover {
+            background: #fdecea;
+            border-color: #e57373;
+            color: #c62828;
+        }
+
+        .btn-cancel {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 12px;
+            background: none;
+            border: 1.5px solid var(--sage-light);
+            border-radius: 8px;
+            color: #c62828;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .12s, border-color .12s;
+        }
+
         /* ══════════════════════════════
            MODALS
         ══════════════════════════════ */
@@ -412,6 +464,7 @@
         .modal-header.sage { background: var(--sage); }
         .modal-header.teal { background: #2A7F7F; }
         .modal-header.green { background: #2D7A4F; }
+        .modal-header.red { background: #c0392b; }
 
         .modal-title {
             font-family: 'DM Serif Display', serif;
@@ -519,6 +572,37 @@
         .btn-modal-submit.green { background: #2D7A4F; }
         .btn-modal-submit:hover  { opacity: .88; }
         .btn-modal-submit:active { transform: scale(.98); }
+
+        /* Confirmation footer buttons (edit/delete modals) */
+        .btn-modal-cancel {
+            flex: 1;
+            padding: 11px 20px;
+            border: 1.5px solid var(--sage-light);
+            border-radius: var(--radius);
+            background: none;
+            color: var(--ink-soft);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .12s;
+        }
+        .btn-modal-cancel:hover { background: var(--sage-muted); }
+
+        .btn-modal-danger {
+            flex: 1;
+            padding: 11px 20px;
+            border: none;
+            border-radius: var(--radius);
+            background: #c0392b;
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity .15s;
+        }
+        .btn-modal-danger:hover { opacity: .88; }
     </style>
 </head>
 <body>
@@ -613,9 +697,23 @@
                         <th>No. SIP</th>
                         <th>Jadwal Praktik</th>
                         <th>Status Slot</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
+                    <?php if (empty($dokter_list)): ?>
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/>
+                                    </svg>
+                                    <div>Belum ada data dokter.</div>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+
                     <?php foreach ($dokter_list as $d): ?>
                         <tr>
                             <td><strong><?= $d->nama_dokter; ?></strong></td>
@@ -628,6 +726,39 @@
                                     onclick="setJadwalId('<?= $d->id_jadwal; ?>')">
                                     + Antrean
                                 </button>
+                            </td>
+                            <td>
+                                <div class="action-group">
+                                    <!-- Edit -->
+                                    <button class="btn-icon edit" data-bs-toggle="modal" data-bs-target="#modalEditDokter"
+                                        data-id="<?= $d->id_dokter; ?>"
+                                        data-id-jadwal="<?= $d->id_jadwal; ?>"
+                                        data-nama="<?= htmlspecialchars($d->nama_dokter, ENT_QUOTES); ?>"
+                                        data-spesialisasi="<?= htmlspecialchars($d->spesialisasi, ENT_QUOTES); ?>"
+                                        data-sip="<?= htmlspecialchars($d->nomor_sip, ENT_QUOTES); ?>"
+                                        data-hari="<?= $d->hari; ?>"
+                                        data-jam-mulai="<?= $d->jam_mulai; ?>"
+                                        data-jam-selesai="<?= $d->jam_selesai; ?>"
+                                        onclick="setEditDokter(this)" title="Edit">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                        </svg>
+                                    </button>
+
+                                    <!-- Hapus -->
+                                    <button class="btn-icon delete" data-bs-toggle="modal" data-bs-target="#modalHapusDokter"
+                                        data-id="<?= $d->id_dokter; ?>"
+                                        data-nama="<?= htmlspecialchars($d->nama_dokter, ENT_QUOTES); ?>"
+                                        onclick="setHapusDokter(this)" title="Hapus">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6"/>
+                                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                            <path d="M10 11v6"/><path d="M14 11v6"/>
+                                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                                        </svg>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -674,13 +805,25 @@
                             <td style="font-size:13.5px;"><?= $a->nama_dokter; ?></td>
                             <td style="font-size:13.5px; color:var(--ink-soft);"><?= date('d M Y', strtotime($a->tanggal_konsultasi)); ?></td>
                             <td>
-                                <button class="btn-examine" data-bs-toggle="modal" data-bs-target="#modalSelesai"
-                                    onclick="setSelesaiData('<?= $a->id_konsultasi; ?>', '<?= $a->id_pasien; ?>', '<?= $a->id_jadwal; ?>')">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-                                    </svg>
-                                    Periksa Pasien
-                                </button>
+                                <div class="action-group">
+                                    <button class="btn-examine" data-bs-toggle="modal" data-bs-target="#modalSelesai"
+                                        onclick="setSelesaiData('<?= $a->id_konsultasi; ?>', '<?= $a->id_pasien; ?>', '<?= $a->id_jadwal; ?>')">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                                        </svg>
+                                        Periksa Pasien
+                                    </button>
+
+                                    <button class="btn-cancel" data-bs-toggle="modal" data-bs-target="#modalHapusAntrean"
+                                        data-id="<?= $a->id_konsultasi; ?>"
+                                        data-nama="<?= htmlspecialchars($a->nama_pasien, ENT_QUOTES); ?>"
+                                        onclick="setHapusAntrean(this)">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                                        </svg>
+                                        Batalkan
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -748,6 +891,91 @@
     </div>
 </div>
 
+<!-- ══ MODAL: Edit Dokter ══ -->
+<div class="modal fade" id="modalEditDokter" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <form action="<?= base_url('admin/update_dokter'); ?>" method="POST" class="modal-content">
+            <div class="modal-header sage">
+                <h5 class="modal-title">Edit Data Dokter</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="id_dokter" id="edit_id_dokter">
+                <input type="hidden" name="id_jadwal" id="edit_id_jadwal">
+
+                <div class="m-field">
+                    <label class="m-label">Nama Dokter</label>
+                    <input type="text" name="nama_dokter" id="edit_nama_dokter" class="m-input" required>
+                </div>
+                <div class="m-row">
+                    <div class="m-field">
+                        <label class="m-label">Spesialisasi</label>
+                        <input type="text" name="spesialisasi" id="edit_spesialisasi" class="m-input" required>
+                    </div>
+                    <div class="m-field">
+                        <label class="m-label">Nomor SIP</label>
+                        <input type="text" name="nomor_sip" id="edit_nomor_sip" class="m-input" required>
+                    </div>
+                </div>
+
+                <div class="m-divider"><span>Jadwal Kerja Praktik</span></div>
+
+                <div class="m-field">
+                    <label class="m-label">Hari Praktik</label>
+                    <select name="hari" id="edit_hari" class="m-select" required>
+                        <option value="">-- Pilih Hari --</option>
+                        <option value="Senin">Senin</option>
+                        <option value="Selasa">Selasa</option>
+                        <option value="Rabu">Rabu</option>
+                        <option value="Kamis">Kamis</option>
+                        <option value="Jumat">Jumat</option>
+                        <option value="Sabtu">Sabtu</option>
+                        <option value="Minggu">Minggu</option>
+                    </select>
+                </div>
+                <div class="m-row">
+                    <div class="m-field">
+                        <label class="m-label">Jam Mulai</label>
+                        <input type="time" name="jam_mulai" id="edit_jam_mulai" class="m-input" required>
+                    </div>
+                    <div class="m-field">
+                        <label class="m-label">Jam Selesai</label>
+                        <input type="time" name="jam_selesai" id="edit_jam_selesai" class="m-input" required>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn-modal-submit sage">Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ══ MODAL: Hapus Dokter ══ -->
+<div class="modal fade" id="modalHapusDokter" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <form action="<?= base_url('admin/hapus_dokter'); ?>" method="POST" class="modal-content">
+            <div class="modal-header red">
+                <h5 class="modal-title">Hapus Data Dokter</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="id_dokter" id="hapus_id_dokter">
+                <p style="font-size:14px; color:var(--ink);">
+                    Yakin ingin menghapus data dokter
+                    <strong id="hapus_nama_dokter"></strong>?
+                    Jadwal praktiknya juga akan ikut terhapus dan tindakan ini
+                    <strong>tidak dapat dibatalkan</strong>.
+                </p>
+            </div>
+            <div class="modal-footer" style="display:flex; gap:10px;">
+                <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" class="btn-modal-danger">Ya, Hapus</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- ══ MODAL: Daftar Konsultasi ══ -->
 <div class="modal fade" id="modalDaftar" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
@@ -806,6 +1034,29 @@
     </div>
 </div>
 
+<!-- ══ MODAL: Batalkan Antrean ══ -->
+<div class="modal fade" id="modalHapusAntrean" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <form action="<?= base_url('admin/hapus_konsultasi'); ?>" method="POST" class="modal-content">
+            <div class="modal-header red">
+                <h5 class="modal-title">Batalkan Antrean</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="id_konsultasi" id="hapus_id_konsultasi">
+                <p style="font-size:14px; color:var(--ink);">
+                    Batalkan antrean konsultasi untuk pasien
+                    <strong id="hapus_nama_antrean"></strong>?
+                </p>
+            </div>
+            <div class="modal-footer" style="display:flex; gap:10px;">
+                <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" class="btn-modal-danger">Ya, Batalkan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     /* Tab switching */
@@ -822,6 +1073,30 @@
         document.getElementById('selesai_id_konsultasi').value = konsultasiId;
         document.getElementById('selesai_id_pasien').value = pasienId;
         document.getElementById('selesai_id_jadwal').value = jadwalId;
+    }
+
+    /* Isi modal Edit Dokter dengan data dari tombol yang diklik */
+    function setEditDokter(btn) {
+        document.getElementById('edit_id_dokter').value     = btn.dataset.id;
+        document.getElementById('edit_id_jadwal').value     = btn.dataset.idJadwal;
+        document.getElementById('edit_nama_dokter').value   = btn.dataset.nama;
+        document.getElementById('edit_spesialisasi').value  = btn.dataset.spesialisasi;
+        document.getElementById('edit_nomor_sip').value     = btn.dataset.sip;
+        document.getElementById('edit_hari').value          = btn.dataset.hari;
+        document.getElementById('edit_jam_mulai').value     = btn.dataset.jamMulai;
+        document.getElementById('edit_jam_selesai').value   = btn.dataset.jamSelesai;
+    }
+
+    /* Isi modal Hapus Dokter */
+    function setHapusDokter(btn) {
+        document.getElementById('hapus_id_dokter').value = btn.dataset.id;
+        document.getElementById('hapus_nama_dokter').textContent = btn.dataset.nama;
+    }
+
+    /* Isi modal Batalkan Antrean */
+    function setHapusAntrean(btn) {
+        document.getElementById('hapus_id_konsultasi').value = btn.dataset.id;
+        document.getElementById('hapus_nama_antrean').textContent = btn.dataset.nama;
     }
 </script>
 </body>
